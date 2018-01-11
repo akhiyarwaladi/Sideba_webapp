@@ -62,6 +62,8 @@ def date_to_nth_day(date, format='%Y%m%d'):
 def downloadFile(scene_id_post):
 
 	print scene_id_post
+	print scene_id_post[3:9]
+
 	tupDate = datetime.now()
 	print tupDate.year
 	print tupDate.strftime('%j')
@@ -76,6 +78,7 @@ def downloadFile(scene_id_post):
 	#ftp.cwd(str(tupDate.strftime('%j')))
 	cloud_dict = {}
 	cloud_dict_id = {}
+
 	for i in range(151, 213):
 		ftp.cwd(str(i))
 		for level in ftp.nlst():
@@ -173,6 +176,7 @@ def downloadFile(scene_id_post):
 		# print extension
 		# print unique
 
+	os.chdir("C:/Apps/Sideba_webapp")
 	return scene
 
 # if __name__ == '__main__':

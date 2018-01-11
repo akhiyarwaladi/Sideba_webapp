@@ -100,7 +100,7 @@ def tail():
 
 	pre_flood = config.FOLDER_PREFLOOD + "/" + sceneIdPre
 	post_flood = config.FOLDER_POSTFLOOD + "/" + sceneIdPost
-	out_process = "C:/hasil" + "/" + sceneIdPost
+	out_process = config.FOLDER_OUTPUT + "/" + sceneIdPost
 
 	if(os.path.exists(out_process)):
 		import shutil
@@ -155,10 +155,9 @@ def tail():
 	#dp.layerToKml(out_process)
 
 	msg = str(datetime.now()) + '\t' + "Finished ... \n"
-	shutil.rmtree('C:/data/banjir/LC81190652017291LGN00')
+
 	redis.rpush(config.MESSAGES_KEY, msg)
 	redis.publish(config.CHANNEL_NAME, msg)
-
 	redis.delete(config.MESSAGES_KEY)
 
 class TailNamespace(BaseNamespace):

@@ -139,9 +139,9 @@ def process_landsat(path, projection, out, flag, data_type, threshold_type, outp
         reproject(path, output, projection, mtl)
         cloud_mask(path, out, output, mtl)
         calc_toa(Fcloud, toa, mtl)
-        stack_bands(toa, mtl, data_type)
-        pan_sharpen(toa, mtl, data_type)
-        spatial_filter(toa, mtl, path)
+        #stack_bands(toa, mtl, data_type)
+        #pan_sharpen(toa, mtl, data_type)
+        #spatial_filter(toa, mtl, path)
         calc_ndwi(toa, mtl, data_type, threshold_type)
 
     finally:
@@ -158,7 +158,7 @@ def reproject(input_dir, output_dir, projection, meta):
     rasters = ap.ListRasters('*.TIF')
     #ms_bands = [band for band in rasters if (band_nmbr(band) != None)]
     
-    ms_bands = [band for band in rasters if (band_nmbr(band) >= 1 and band_nmbr(band) <=8)]
+    ms_bands = [band for band in rasters if (band_nmbr(band) == 3 or band_nmbr(band) == 4 or band_nmbr(band) == 5)]
     bqa_band = [band for band in rasters if (band_nmbr(band) == None)][0]
     
     try:
@@ -390,7 +390,7 @@ def calc_ndwi(path, meta, data_type, threshold_type):
         green = Float(ap.sa.Raster(ap.ListRasters('*B3.img')[0]))
         red = Float(ap.sa.Raster(ap.ListRasters('*B4.img')[0]))
         nir = Float(ap.sa.Raster(ap.ListRasters('*B5.img')[0]))
-        swir = Float(ap.sa.Raster(ap.ListRasters('*B6.img')[0]))
+        #swir = Float(ap.sa.Raster(ap.ListRasters('*B6.img')[0]))
 
     else:
         green = Float(ap.sa.Raster(ap.ListRasters('*B2.img')[0]))
@@ -502,7 +502,7 @@ def pixelExtraction(path, pre_flood, post_flood, NDWIDiff, NDWIPost):
 
     redPre = ap.sa.Raster(path+"/processed_PreFlood/toa/"+pre_flood+"TOA_B4.img")
     nirPost = ap.sa.Raster(path+"/processed_PostFlood/toa/"+post_flood+"TOA_B5.img")
-    swirPost = ap.sa.Raster(path+"/processed_PostFlood/toa/"+post_flood+"TOA_B6.img")
+    #swirPost = ap.sa.Raster(path+"/processed_PostFlood/toa/"+post_flood+"TOA_B6.img")
 
     ndwiDiff = ap.sa.Raster(path+"/DIFF_NDWI.img")
     ndwiPost = ap.sa.Raster(path+"/processed_PostFlood/toa/"+post_flood+"_NDWI.img")

@@ -18,3 +18,4 @@ CHANNEL_NAME_2 = 'val-channel'
 
 FOLDER_PREFLOOD = 'C:/data/banjir/preFlood'
 FOLDER_POSTFLOOD = 'C:/data/banjir/postFlood'
+FOLDER_OUTPUT = 'C:/data/banjir/hasil'
