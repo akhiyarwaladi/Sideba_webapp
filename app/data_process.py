@@ -51,7 +51,8 @@ class masker:
 
 def mask_cloud(path, masktype, confidence, cummulative, out):
     convalue = {'High' : 3, 'Medium' : 2, 'Low' : 1, 'None' : 0}
-    maskvalue = {'Cloud' : 14, 'Cirrus' : 12, 'Snow' : 10, 'Vegetation' : 8, 'Water' : 4}
+    #maskvalue = {'Cloud' : 14, 'Cirrus' : 12, 'Snow' : 10, 'Vegetation' : 8, 'Water' : 4}
+    maskvalue = {'Cloud' : 4, 'Cirrus' : 11, 'Snow' : 9, 'Vegetation' : 1, 'Water' : 10}
 
     ap.env.workspace = out
     output = out+'/mask_cloud_'+str(os.path.basename(path))+'.TIF'
