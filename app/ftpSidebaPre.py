@@ -63,122 +63,140 @@ def downloadFile(scene_id_post):
 
 	print scene_id_post
 	print scene_id_post[3:9]
+	pathRowPost = scene_id_post[3:9]
 
-	tupDate = datetime.now()
-	print tupDate.year
-	print tupDate.strftime('%j')
-	#print now.year, now.month, now.day, now.hour, now.minute, now.second # check every datetime detail
+	##################### Mulai koneksi ke ftp, ganti credential ########################
 	ftp = FTP( )
 	ftp.connect(host='localhost', port=21, timeout=1246)
 	ftp.login(user='akhiyarwaladi', passwd='rickss12')
 	#ftp.retrlines('LIST') # use to check file after connected
+	#####################################################################################
+
+	# masuk ke folder landsat 8
 	ftp.cwd('Landsat_8')
-	#ftp.cwd(str(tupDate.year))
+	# masuk ke folder 2017
 	ftp.cwd('2017')
-	#ftp.cwd(str(tupDate.strftime('%j')))
+
+	# untuk menyimpan besarnya cloud cover scene yang akan dipakai
 	cloud_dict = {}
+	# untuk menyimpan ID scene 
 	cloud_dict_id = {}
 
+	# looping dari doy musing kering yaitu 151 sampai 213, dapat disesuaikan kemudian
 	for i in range(151, 213):
+		# masuk ke folder hari doy satu persatu
 		ftp.cwd(str(i))
+		# looping setiap jenis level data yang tersedia
 		for level in ftp.nlst():
 			print level
+			# masuk ke jenis level data
 			ftp.cwd(str(level))
+			# looping setiap folder scene yang tersedia
 			for scene in ftp.nlst():
+				# dapatkan pathrow dari scene yang tersedia
+				pathRowPre = scene[3:9]
+				print pathRowPre
+				# jika pathrow dari post tidak sama dengan scene yang saat ini tersedia
+				if (pathRowPost != pathRowPre):
+					print "pathrow tidak sama"
+					# cari scene yang lain / keluar dari folder scene
+					continue;
 
+				# jika pathrow sama, masuk ke folder scene 
 				ftp.cwd(scene)
+				# jadikan list setiap file yang ada
 				filesPreFlood = ftp.nlst()
 
+				# cari metadata file dari scene yang saat ini tersedia
 				fileMtl = [txt for txt in filesPreFlood if 'MTL.txt' in txt][0]
 				print fileMtl
-				localfile = open(fileMtl, 'wb')
 
+				# donwload file metadata scene ini
+				localfile = open(fileMtl, 'wb')
 				ftp.retrbinary('RETR ' + fileMtl, localfile.write, 1024)
 				localfile.close()
 
+				# jika file metadata ada pada workstation, hapus file tersebut
 				if(os.path.exists('C:/data/banjir/preFlood/' + fileMtl)):
 					os.remove('C:/data/banjir/preFlood/' + fileMtl)
+				# pindahkan file metadata ke workstation
 				os.rename(fileMtl,'C:/data/banjir/preFlood/' + fileMtl)
 
+				# parsing file metadata ke dictionary
 				mtl = parse_mtl('C:/data/banjir/preFlood/', fileMtl)
+				# dapatkan product id dari metadata
 				product_id = str(mtl['L1_METADATA_FILE']['LANDSAT_PRODUCT_ID'])
+				# dapatkan cloud cover dari metadata
 				cloud_cover = str(mtl['IMAGE_ATTRIBUTES']['CLOUD_COVER_LAND'])
 
 				print product_id
 				print cloud_cover
+				# masukkan cloud cover ke dictionary
 				cloud_dict[product_id] = cloud_cover
+				# masukkan scene id ke dictionary
 				cloud_dict_id[product_id] = scene
-				# for file in filesPreFlood:
-				# 	print 'haha'
-					# fileMtl = [txt for txt in filesPreFlood if 'MTL.txt' in txt][0]
-					# mtl = parse_mtl(fileMtl)
 
-					# cloud_cover = str(mtl['IMAGE_ATTRIBUTES']['CLOUD_COVER_LAND'])
-
-
-					# msg = str(datetime.now()) + '\t' + "Downloading "+ str(file) + "\n"
-					# filename = file #replace with your file in the directory ('directory_name')
-					# localfile = open(filename, 'wb')
-					# if(os.path.exists('C:/data/banjir/'+ scene +'/'+filename)):
-					# 	os.remove('C:/data/banjir/'+ scene +'/'+filename)
-
-					# ftp.retrbinary('RETR ' + filename, localfile.write, 1024)
-					# localfile.close()
-
-
-					# os.rename(filename,'C:/data/banjir/'+ scene +'/'+filename)
-
+				# keluar dari scene
 				ftp.cwd("../")
+			# keluar dari level
 			ftp.cwd("../")
+		# keluar dari hari doy
 		ftp.cwd("../")
 
 	print cloud_dict
+	# dapatkan product id yang cloud covernya paling minimun dala dictionary
 	bestPreFlood = min(cloud_dict, key=cloud_dict.get)
-	bestPreFloodList = bestPreFlood.split("_")
+	# dapatkan scene id berdasarkan product id yang terbaik, karena folder ftp dalam bentuk scene id
 	scene = cloud_dict_id[bestPreFlood]
 
+	# split product id yang terbaik untuk mendapatkan detil folder
+	bestPreFloodList = bestPreFlood.split("_")
 	print date_to_nth_day(bestPreFloodList[3])
-	print scene
 
+	# masuk ke folder hari dalam doy
 	ftp.cwd(str(date_to_nth_day(bestPreFloodList[3])))
+	# masuk ke folder level data
 	ftp.cwd(bestPreFloodList[1])
+	# masuk ke dalam folder scene
 	ftp.cwd(scene)
+	# jadikan list semua file dalam folder
 	filesPreFlood = ftp.nlst()
 
+	# jika file sudah ada dalam workstation
 	if(os.path.exists('C:/data/banjir/preFlood/'+ scene)):
+		# hapus file tersebut
 		shutil.rmtree('C:/data/banjir/preFlood/'+ scene)
+	# buat folder baru dalam workstation
 	os.makedirs('C:/data/banjir/preFlood/'+ scene)
 
+	# looping setiap file dalam folder
 	for file in filesPreFlood:
 		print file
 		msg = str(datetime.now()) + '\t' + "Downloading "+ str(file) + "\n"
 		filename = file #replace with your file in the directory ('directory_name')
+
+		######################## Mulai download file##################################
 		localfile = open(filename, 'wb')
 		if(os.path.exists('C:/data/banjir/preFlood/'+ scene +'/'+filename)):
 			os.remove('C:/data/banjir/preFlood/'+ scene +'/'+filename)
 
 		ftp.retrbinary('RETR ' + filename, localfile.write, 1024)
 		localfile.close()
+		##############################################################################
 
-
+		# pindahkan dari local ke folder yang seharusnya
 		os.rename(filename,'C:/data/banjir/preFlood/'+ scene +'/'+filename)
 
-
+	#################### UBAH FORMAT NAMA FILE #####################################
 	os.chdir('C:/data/banjir/preFlood/'+ scene)
-
 	for filename in os.listdir('C:/data/banjir/preFlood/'+ scene):
 		productID = filename.split(".")[0]
 		extension = filename.split(".")[1]
 		unique = filename.split(".")[0].split("_")[7]
 
 		os.rename(filename, scene + "_" + unique + "." + extension)
-		# print productID
-		# print extension
-		# print unique
-
+	#################################################################################
+	# kembali lagi ke folder aplikasi
 	os.chdir("C:/Apps/Sideba_webapp")
+	# kembalikan scene id ke program utama
 	return scene
-
-# if __name__ == '__main__':
-	
-# 	downloadFile()

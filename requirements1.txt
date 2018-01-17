@@ -15,7 +15,7 @@ pytz==2014.10
 redis==2.10.3
 gevent==1.1b4
 Flask-SocketIO==0.5.0
-gevent-socketio==0.3.6
+gevent-socketio==0.3.5-rc2
 gevent-websocket==0.9.3
 python-socketio==1.8.4
 flask_assets==0.12
