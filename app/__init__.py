@@ -92,16 +92,21 @@ def stop():
 @celery.task
 def tail():
 	while(1):
-		#downloadData = fc.downloadFile()
+		############################## BUKA DATA LOG PROSES HARI INI #########################################
 		log = pd.read_csv("logComplete.csv")
-		print(log)
 		liScene = log["scene"].tolist()
 		liDate = log["dateComplete"].tolist()
+		#######################################################################################################
 
+		############################## DOWNLOAD SCENE SAAT BANJIR #############################################
 		sceneIdPost, boolScene = ftpPost.downloadFile(liScene)
+		print sceneIdPost
 		print str(boolScene)
+		#######################################################################################################
+
 		if(boolScene == False):
 			print "Data hari ini selesai diproses"
+			time.sleep(1000)
 		else:
 			sceneIdPre = ftpPre.downloadFile(sceneIdPost)
 			# os.chdir('C:/data/banjir/postFlood/'+ sceneIdPost)
@@ -162,17 +167,17 @@ def tail():
 			NDWIduring = "0.548"
 
 			dp.diffNDWI(out_process, os.path.basename(pre_flood), os.path.basename(post_flood))
-
 			dp.pixelExtraction(out_process, os.path.basename(pre_flood), os.path.basename(post_flood), deltaNDWI, NDWIduring)
-
 			dp.maskOutFinal(out_process, pre_flood)
-
 			dp.final_spatial_filter(out_process, pre_flood)
 
 			#dp.rasterToVector(out_process)
 			#dp.layerToKml(out_process)
+
+			####################### SAVE LOG DATA YANG TELAH SELESAI DIPROSES ########################################
 			liScene.append(sceneIdPost)
 			liDate.append(str(datetime.now()))
+
 			print(liScene)
 			print(liDate)
 
@@ -187,6 +192,7 @@ def tail():
 
 			print(log2.head(5))
 			log2.to_csv("logComplete.csv", index=False)
+			##########################################################################################################
 
 			msg = str(datetime.now()) + '\t' + "Finished ... \n"
 
