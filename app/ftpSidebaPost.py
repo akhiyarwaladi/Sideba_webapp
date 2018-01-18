@@ -65,6 +65,8 @@ def downloadFile(liScene):
 				# pindahkan data dari local workspace ftp download ke tempat seharusnya
 				os.rename(filename,'C:/data/banjir/postFlood/'+ scene +'/'+filename)
 
+			# setelah selesai download satu scene langsung keluar loop
+			break;
 			# keluar dari folder scene
 			ftp.cwd("../")
 		# keluar dari folder level data landsat
@@ -82,5 +84,8 @@ def downloadFile(liScene):
 			# ubah nama file tersebut dengan format [sceneID_band.ext]
 			os.rename(filename, scene + "_" + unique + "." + extension)
 
+	tahun = str(tupDate.year - 1)
+	hari = str(int(tupDate.strftime('%j')) + 273)
+	levelData = str(level)
 	# kembalikan nama scene dan boolean tanda ke program utama
-	return scene, boolScene
+	return scene, boolScene, tahun, hari, levelData

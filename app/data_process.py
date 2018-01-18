@@ -707,7 +707,7 @@ def maskOutFinal(outPath, maskPath):
     outExtractByMask = ExtractByMask(inRaster, inMaskData)
 
     # Save the output 
-    outExtractByMask.save( outPath + "/out_final_mask.img")
+    outExtractByMask.save( outPath + "/out_final_mask.TIF")
     ap.AddMessage("Finished masking")
     msg = str(datetime.now()) + '\t' + "Finished masking" + "\n"
     redis.rpush(config.MESSAGES_KEY, msg)

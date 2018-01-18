@@ -99,7 +99,7 @@ def tail():
 		#######################################################################################################
 
 		############################## DOWNLOAD SCENE SAAT BANJIR #############################################
-		sceneIdPost, boolScene = ftpPost.downloadFile(liScene)
+		sceneIdPost, boolScene, tahun, hari, levelData = ftpPost.downloadFile(liScene)
 		print sceneIdPost
 		print str(boolScene)
 		#######################################################################################################
@@ -169,8 +169,12 @@ def tail():
 			dp.diffNDWI(out_process, os.path.basename(pre_flood), os.path.basename(post_flood))
 			dp.pixelExtraction(out_process, os.path.basename(pre_flood), os.path.basename(post_flood), deltaNDWI, NDWIduring)
 			dp.maskOutFinal(out_process, pre_flood)
-			dp.final_spatial_filter(out_process, pre_flood)
+			#dp.final_spatial_filter(out_process, pre_flood)
 
+			os.makedirs(config.FOLDER_OUTPUT + "/" + tahun + "/" + hari + "/" + levelData + "/" + sceneIdPost)
+			print str(out_process + "/out_final_mask.TIF")
+			print str(config.FOLDER_OUTPUT + "/" + tahun + "/" + hari + "/" + levelData + "/" + sceneIdPost + "/" + sceneIdPost + ".TIF")
+			shutil.copyfile(out_process + "/out_final_mask.TIF", config.FOLDER_OUTPUT + "/" + tahun + "/" + hari + "/" + levelData + "/" + sceneIdPost + "/" + sceneIdPost + ".TIF")
 			#dp.rasterToVector(out_process)
 			#dp.layerToKml(out_process)
 
