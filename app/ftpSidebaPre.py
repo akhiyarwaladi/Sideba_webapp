@@ -161,6 +161,9 @@ def downloadFile(scene_id_post):
 	ftp.cwd(scene)
 	# jadikan list semua file dalam folder
 	filesPreFlood = ftp.nlst()
+	filesPreFlood2 = [img for img in filesPreFlood if img.endswith("_B3.TIF") or img.endswith("_B4.TIF") or img.endswith("_B5.TIF") or 
+	img.endswith("_BQA.TIF") or img.endswith("_MTL.txt")]
+	print filesPreFlood2
 
 	# jika file sudah ada dalam workstation
 	if(os.path.exists('C:/data/banjir/preFlood/'+ scene)):
@@ -170,7 +173,7 @@ def downloadFile(scene_id_post):
 	os.makedirs('C:/data/banjir/preFlood/'+ scene)
 
 	# looping setiap file dalam folder
-	for file in filesPreFlood:
+	for file in filesPreFlood2:
 		print file
 		msg = str(datetime.now()) + '\t' + "Downloading "+ str(file) + "\n"
 		filename = file #replace with your file in the directory ('directory_name')

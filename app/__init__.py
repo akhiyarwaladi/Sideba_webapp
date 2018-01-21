@@ -91,7 +91,9 @@ def stop():
 
 @celery.task
 def tail():
+	tupDateNow = datetime.now()
 	while(1):
+
 		############################## BUKA DATA LOG PROSES HARI INI #########################################
 		log = pd.read_csv("logComplete.csv")
 		liScene = log["scene"].tolist()
@@ -106,7 +108,13 @@ def tail():
 
 		if(boolScene == False):
 			print "Data hari ini selesai diproses"
-			time.sleep(1000)
+			tupDateLoop = datetime.now()
+			while (tupDateNow.day == tupDateLoop.day):
+				print "menunggu hari berganti :)"
+				time.sleep(10)
+			tupDateNow = tupDateLoop
+			print "hari telah berganti"
+
 		else:
 			sceneIdPre = ftpPre.downloadFile(sceneIdPost)
 			# os.chdir('C:/data/banjir/postFlood/'+ sceneIdPost)
@@ -168,13 +176,16 @@ def tail():
 
 			dp.diffNDWI(out_process, os.path.basename(pre_flood), os.path.basename(post_flood))
 			dp.pixelExtraction(out_process, os.path.basename(pre_flood), os.path.basename(post_flood), deltaNDWI, NDWIduring)
-			dp.maskOutFinal(out_process, pre_flood)
+			if(os.path.exists(config.FOLDER_OUTPUT + "/" + tahun + "/" + hari + "/" + levelData + "/" + sceneIdPost)):
+				shutil.rmtree(config.FOLDER_OUTPUT + "/" + tahun + "/" + hari + "/" + levelData + "/" + sceneIdPost)
+			os.makedirs(config.FOLDER_OUTPUT + "/" + tahun + "/" + hari + "/" + levelData + "/" + sceneIdPost)			
+			dp.maskOutFinal(out_process, pre_flood, config.FOLDER_OUTPUT + "/" + tahun + "/" + hari + "/" + levelData + "/" + sceneIdPost + "/" + sceneIdPost + ".TIF")
 			#dp.final_spatial_filter(out_process, pre_flood)
 
-			os.makedirs(config.FOLDER_OUTPUT + "/" + tahun + "/" + hari + "/" + levelData + "/" + sceneIdPost)
-			print str(out_process + "/out_final_mask.TIF")
-			print str(config.FOLDER_OUTPUT + "/" + tahun + "/" + hari + "/" + levelData + "/" + sceneIdPost + "/" + sceneIdPost + ".TIF")
-			shutil.copyfile(out_process + "/out_final_mask.TIF", config.FOLDER_OUTPUT + "/" + tahun + "/" + hari + "/" + levelData + "/" + sceneIdPost + "/" + sceneIdPost + ".TIF")
+
+			#print str(out_process + "/out_final_mask.TIF")
+			#print str(config.FOLDER_OUTPUT + "/" + tahun + "/" + hari + "/" + levelData + "/" + sceneIdPost + "/" + sceneIdPost + ".TIF")
+			#shutil.copy2(out_process + "/out_final_mask.TIF", config.FOLDER_OUTPUT + "/" + tahun + "/" + hari + "/" + levelData + "/" + sceneIdPost + "/" + sceneIdPost + ".TIF")
 			#dp.rasterToVector(out_process)
 			#dp.layerToKml(out_process)
 

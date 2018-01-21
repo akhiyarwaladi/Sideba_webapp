@@ -4,6 +4,8 @@ from datetime import datetime
 import shutil
 def downloadFile(liScene):
 	boolScene = False
+	sceneData = ""
+	levelData = ""
 	print "Sudah diproses " + str(liScene)
 	tupDate = datetime.now()
 	#print now.year, now.month, now.day, now.hour, now.minute, now.second # check every datetime detail
@@ -16,18 +18,24 @@ def downloadFile(liScene):
 	########################################################################################
 	# masuk ke folder landsat 8
 	ftp.cwd('Landsat_8')
+	tahun = str(tupDate.year - 1)
+	hari = str(int(tupDate.strftime('%j')) + 269)
+	print tahun
+	print hari
 	# masuk ke folder tahun
-	ftp.cwd(str(tupDate.year - 1))
+	ftp.cwd(tahun)
 	# masuk ke folder hari dalam format doy
-	ftp.cwd(str(int(tupDate.strftime('%j')) + 273))
+	ftp.cwd(hari)
 	# looping setiap folder level data landsat
 	for level in ftp.nlst():
 		print level
 		# masuk ke folder level yang tersedia
 		ftp.cwd(str(level))
+		levelData = str(level)
 		# looping setiap folder scene yang ditemukan
 		for scene in ftp.nlst():
 			print scene
+			sceneData = scene
 			# jika scene termasuk kedalam list yang telah diproses
 			if scene in liScene:
 				print "scene " + str(scene) + " sudah diproses"
@@ -46,8 +54,11 @@ def downloadFile(liScene):
 			ftp.cwd(scene)
 			# jadikan list semua file yang ada dalam folder scenen untuk didownload
 			filesPreFlood = ftp.nlst()
+			filesPreFlood2 = [img for img in filesPreFlood if img.endswith("_B3.TIF") or img.endswith("_B4.TIF") or img.endswith("_B5.TIF") or 
+			img.endswith("_BQA.TIF") or img.endswith("_MTL.txt")]
+			print filesPreFlood2
 			# looping setiap file yang ada
-			for file in filesPreFlood:
+			for file in filesPreFlood2:
 				print file
 
 				msg = str(datetime.now()) + '\t' + "Downloading "+ str(file) + "\n"
@@ -84,8 +95,5 @@ def downloadFile(liScene):
 			# ubah nama file tersebut dengan format [sceneID_band.ext]
 			os.rename(filename, scene + "_" + unique + "." + extension)
 
-	tahun = str(tupDate.year - 1)
-	hari = str(int(tupDate.strftime('%j')) + 273)
-	levelData = str(level)
 	# kembalikan nama scene dan boolean tanda ke program utama
-	return scene, boolScene, tahun, hari, levelData
+	return sceneData, boolScene, tahun, hari, levelData

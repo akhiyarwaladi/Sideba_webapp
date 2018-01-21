@@ -685,7 +685,7 @@ def rasterToVector(path):
 
     ap.RasterToPolygon_conversion(inRaster[0], out_vector, "NO_SIMPLIFY", field)
 
-def maskOutFinal(outPath, maskPath):
+def maskOutFinal(outPath, maskPath, finalPath):
     # Set local variables
     inRaster = outPath + "/out_final.img"
     kerPath = os.path.join(str(os.getcwd()),"INDONESIA_PROP.shp")
@@ -708,6 +708,8 @@ def maskOutFinal(outPath, maskPath):
 
     # Save the output 
     outExtractByMask.save( outPath + "/out_final_mask.TIF")
+    print finalPath
+    ap.CopyRaster_management( outExtractByMask, finalPath )
     ap.AddMessage("Finished masking")
     msg = str(datetime.now()) + '\t' + "Finished masking" + "\n"
     redis.rpush(config.MESSAGES_KEY, msg)
