@@ -3,6 +3,7 @@ import os
 from datetime import datetime
 import shutil
 import time
+import smtpEmail as se
 def downloadFile(liScene):
 	boolScene = False
 	sceneData = ""
@@ -20,7 +21,7 @@ def downloadFile(liScene):
 	# masuk ke folder landsat 8
 	ftp.cwd('Landsat_8')
 	tahun = str(tupDate.year - 1)
-	hari = str(int(tupDate.strftime('%j')) + 400)
+	hari = str(int(tupDate.strftime('%j')) + 410)
 	print tahun
 	print hari
 	# masuk ke folder tahun
@@ -29,8 +30,9 @@ def downloadFile(liScene):
 	folderTahun = ftp.nlst()
 	# jika folder hari ini belum ada looping terus
 	while (hari not in folderTahun):
-		print "Belum ada folder data hari ini"
-		time.sleep(5)
+		print "Belum ada folder data hari ini ("+hari+")"
+		se.kirimEmail("Belum ada folder data hari ini ("+hari+")")
+		time.sleep(30)
 		folderTahun = ftp.nlst()
 
 	# masuk ke folder hari dalam format doy
