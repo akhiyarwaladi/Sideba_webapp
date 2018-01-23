@@ -79,6 +79,12 @@ def mask_cloud(path, masktype, confidence, cummulative, out):
     redis.rpush(config.MESSAGES_KEY, msg)
     redis.publish(config.CHANNEL_NAME, msg)
 
+    del outraster
+    del outarray
+    del bitmasker
+    del rasterarray
+    del raster
+
 def reproject_mask_cloud(path, out, project):
     mask = out+'/mask_cloud_'+str(os.path.basename(path))+'.TIF'
     output = out+'/prj_mask_cloud_'+str(os.path.basename(path))+'.TIF'
@@ -687,6 +693,7 @@ def rasterToVector(path):
 
 def maskOutFinal(outPath, maskPath, finalPath):
     # Set local variables
+    print finalPath
     inRaster = outPath + "/out_final.img"
     kerPath = os.path.join(str(os.getcwd()),"INDONESIA_PROP.shp")
     print(kerPath)
@@ -703,18 +710,25 @@ def maskOutFinal(outPath, maskPath, finalPath):
     msg = str(datetime.now()) + '\t' + "Shp Indonesia masking" + "\n"
     redis.rpush(config.MESSAGES_KEY, msg)
     redis.publish(config.CHANNEL_NAME, msg) 
-    # Execute ExtractByMask
-    outExtractByMask = ExtractByMask(inRaster, inMaskData)
+    try:
+        # Execute ExtractByMask
+        outExtractByMask = ExtractByMask(inRaster, inMaskData)
 
-    # Save the output 
-    outExtractByMask.save( outPath + "/out_final_mask.TIF")
-    print finalPath
-    ap.CopyRaster_management( outExtractByMask, finalPath )
-    ap.AddMessage("Finished masking")
-    msg = str(datetime.now()) + '\t' + "Finished masking" + "\n"
-    redis.rpush(config.MESSAGES_KEY, msg)
-    redis.publish(config.CHANNEL_NAME, msg) 
-
+        # Save the output 
+        outExtractByMask.save( outPath + "/out_final_mask.TIF")
+        
+        # move output to final path
+        ap.CopyRaster_management( outExtractByMask, finalPath )
+        ap.AddMessage("Finished masking")
+        msg = str(datetime.now()) + '\t' + "Finished masking" + "\n"
+        redis.rpush(config.MESSAGES_KEY, msg)
+        redis.publish(config.CHANNEL_NAME, msg) 
+    except:
+        # move output to final path
+        inRasterSave = Raster(inRaster)
+        ap.CopyRaster_management( inRasterSave, finalPath )
+        pass
+    
 def layerToKml(outPath):
 	ap.env.workspace = outPath
 	pathLayer = outPath + "/out_final_mask_filter.shp"

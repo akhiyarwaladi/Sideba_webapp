@@ -112,6 +112,8 @@ def tail():
 			while (tupDateNow.day == tupDateLoop.day):
 				print "menunggu hari berganti :)"
 				time.sleep(10)
+				tupDateLoop = datetime.now()
+				
 			tupDateNow = tupDateLoop
 			print "hari telah berganti"
 
@@ -176,10 +178,12 @@ def tail():
 
 			dp.diffNDWI(out_process, os.path.basename(pre_flood), os.path.basename(post_flood))
 			dp.pixelExtraction(out_process, os.path.basename(pre_flood), os.path.basename(post_flood), deltaNDWI, NDWIduring)
-			if(os.path.exists(config.FOLDER_OUTPUT + "/" + tahun + "/" + hari + "/" + levelData + "/" + sceneIdPost)):
-				shutil.rmtree(config.FOLDER_OUTPUT + "/" + tahun + "/" + hari + "/" + levelData + "/" + sceneIdPost)
-			os.makedirs(config.FOLDER_OUTPUT + "/" + tahun + "/" + hari + "/" + levelData + "/" + sceneIdPost)			
-			dp.maskOutFinal(out_process, pre_flood, config.FOLDER_OUTPUT + "/" + tahun + "/" + hari + "/" + levelData + "/" + sceneIdPost + "/" + sceneIdPost + ".TIF")
+
+			pathFinal = config.FOLDER_OUTPUT + "/" + tahun + "/" + hari + "/" + levelData + "/" + sceneIdPost
+			if(os.path.exists(pathFinal)):
+				shutil.rmtree(pathFinal)
+			os.makedirs(pathFinal)			
+			dp.maskOutFinal(out_process, pre_flood, pathFinal + "/" + sceneIdPost + ".TIF")
 			#dp.final_spatial_filter(out_process, pre_flood)
 
 
@@ -208,9 +212,14 @@ def tail():
 			print(log2.head(5))
 			log2.to_csv("logComplete.csv", index=False)
 			##########################################################################################################
+			# hapus folder data input saat banjir
+			shutil.rmtree('C:/data/banjir/postFlood/'+ sceneIdPost)
+			# hapus folder data input sebelum banjir
+			shutil.rmtree('C:/data/banjir/preFlood/'+ sceneIdPre)
+			# hapus folder hasil proses yang berisi banyak data
+			shutil.rmtree('C:/data/banjir/hasil/'+ sceneIdPost)
 
 			msg = str(datetime.now()) + '\t' + "Finished ... \n"
-
 			redis.rpush(config.MESSAGES_KEY, msg)
 			redis.publish(config.CHANNEL_NAME, msg)
 			redis.delete(config.MESSAGES_KEY)

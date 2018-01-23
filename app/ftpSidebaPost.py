@@ -2,6 +2,7 @@ from ftplib import FTP
 import os
 from datetime import datetime
 import shutil
+import time
 def downloadFile(liScene):
 	boolScene = False
 	sceneData = ""
@@ -19,18 +20,42 @@ def downloadFile(liScene):
 	# masuk ke folder landsat 8
 	ftp.cwd('Landsat_8')
 	tahun = str(tupDate.year - 1)
-	hari = str(int(tupDate.strftime('%j')) + 269)
+	hari = str(int(tupDate.strftime('%j')) + 400)
 	print tahun
 	print hari
 	# masuk ke folder tahun
 	ftp.cwd(tahun)
+	# lihat isi di dalam folder tahun
+	folderTahun = ftp.nlst()
+	# jika folder hari ini belum ada looping terus
+	while (hari not in folderTahun):
+		print "Belum ada folder data hari ini"
+		time.sleep(5)
+		folderTahun = ftp.nlst()
+
 	# masuk ke folder hari dalam format doy
 	ftp.cwd(hari)
+	# lihat isi di dalam folder hari format doy
+	folderHari = ftp.nlst()
+	# jika di dalam folder hari kosong looping terus
+	while (len(folderHari) == 0):
+		print "Belum ada data di dalam folder hari " + hari 
+		time.sleep(5)
+		folderHari = ftp.nlst()
+
 	# looping setiap folder level data landsat
 	for level in ftp.nlst():
+
 		print level
 		# masuk ke folder level yang tersedia
 		ftp.cwd(str(level))
+		folderLevel = ftp.nlst()
+
+		# while (len(folderLevel) == 0):
+		# 	print "Belum ada data di dalam folder level " + hari 
+		# 	time.sleep(5)
+		# 	folderLevel = ftp.nlst()
+
 		levelData = str(level)
 		# looping setiap folder scene yang ditemukan
 		for scene in ftp.nlst():
