@@ -21,7 +21,7 @@ def downloadFile(liScene):
 	# masuk ke folder landsat 8
 	ftp.cwd('Landsat_8')
 	tahun = str(tupDate.year - 1)
-	hari = str(int(tupDate.strftime('%j')) + 410)
+	hari = str(int(tupDate.strftime('%j')) + 266)
 	print tahun
 	print hari
 	# masuk ke folder tahun

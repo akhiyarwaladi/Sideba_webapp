@@ -570,13 +570,13 @@ def spatial_filter(path, meta, filterpath):
 def final_spatial_filter(path, filterpath):
     ap.env.workspace = path
     ap.CheckOutExtension("Spatial")
-    out_filter = 'out_final_mask_filter.img'
+    out_filter = 'out_final_filter.img'
     if(os.path.exists(path+"/"+out_filter)):
     	print "..."
         os.remove(path+"/"+out_filter)
 
     print "Saved as: " + out_filter
-    inRaster = path + "/out_final_mask.img"
+    inRaster = path + "/out_final.img"
 
     print ""
     print "Begining Spatial Filtering"
@@ -592,6 +592,7 @@ def final_spatial_filter(path, filterpath):
     print(kerPath)
     outFocalStatistics = ap.sa.FocalStatistics(inRaster, ap.sa.NbrIrregular(kerPath))
     out_final_filter = Con((outFocalStatistics == 1), 1, 0)
+
     # Save the output 
     out_final_filter.save(out_filter)
 
@@ -694,7 +695,7 @@ def rasterToVector(path):
 def maskOutFinal(outPath, maskPath, finalPath):
     # Set local variables
     print finalPath
-    inRaster = outPath + "/out_final.img"
+    inRaster = outPath + "/out_final_filter.img"
     kerPath = os.path.join(str(os.getcwd()),"INDONESIA_PROP.shp")
     print(kerPath)
     inMaskData = str(kerPath)

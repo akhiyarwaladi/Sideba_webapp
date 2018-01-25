@@ -3,11 +3,11 @@ from email.MIMEMultipart import MIMEMultipart
 from email.MIMEText import MIMEText
 def kirimEmail(pesan):
 	fromaddr = "akiyar18@gmail.com"
-	toaddr = ["akiyar18@gmail.com", "akiyar@apps.ipb.ac.id"]
+	toaddr = ["akiyar18@gmail.com", "akiyar@apps.ipb.ac.id", "imas.sitanggang@apps.ipb.ac.id"]
 	msg = MIMEMultipart()
 	# msg['From'] = fromaddr
 	# msg['To'] = toaddr
-	msg['Subject'] = "Sideba (Sistem deteksi banjir)"
+	msg['Subject'] = "Notifikasi SiDeba (Sistem Deteksi Banjir)"
 	
 	body = pesan
 	msg.attach(MIMEText(body, 'plain'))

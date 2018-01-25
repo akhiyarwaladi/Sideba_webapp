@@ -8,13 +8,12 @@ from socketio.namespace import BaseNamespace
 
 from assets import assets
 import config
-import celeryconfig
+#import celeryconfig
 
 import pandas as pd
 import os
 import arcpy
 import data_process as dp
-import predictCl as pc
 import ftpClient as fc
 import ftpSidebaPre as ftpPre
 import ftpSidebaPost as ftpPost
@@ -136,7 +135,6 @@ def tail():
 			out_process = config.FOLDER_OUTPUT + "/" + sceneIdPost
 
 			if(os.path.exists(out_process)):
-				import shutil
 				shutil.rmtree(out_process, ignore_errors=True)
 
 			text_files = [f for f in os.listdir(pre_flood) if f.endswith('.TIF') or f.endswith('.tif')]
@@ -180,11 +178,14 @@ def tail():
 			dp.pixelExtraction(out_process, os.path.basename(pre_flood), os.path.basename(post_flood), deltaNDWI, NDWIduring)
 
 			pathFinal = config.FOLDER_OUTPUT + "/" + tahun + "/" + hari + "/" + levelData + "/" + sceneIdPost
+			
 			if(os.path.exists(pathFinal)):
 				shutil.rmtree(pathFinal)
-			os.makedirs(pathFinal)			
+			os.makedirs(pathFinal)
+
+			dp.final_spatial_filter(out_process, pre_flood)	
 			dp.maskOutFinal(out_process, pre_flood, pathFinal + "/" + sceneIdPost + ".TIF")
-			#dp.final_spatial_filter(out_process, pre_flood)
+			
 
 
 			#print str(out_process + "/out_final_mask.TIF")
