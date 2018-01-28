@@ -109,7 +109,7 @@ def tail():
 			print tupDateNow
 			print tupDateLoop
 			#while (tupDateNow.day == tupDateLoop.day):
-			while (tupDateNow.minute + 1 > tupDateLoop.minute):
+			while (tupDateNow.minute + 2 > tupDateLoop.minute):
 				print "menunggu hari berganti :)"
 				time.sleep(10)
 				tupDateLoop = datetime.now()

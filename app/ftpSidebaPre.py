@@ -3,6 +3,9 @@ import os
 from datetime import datetime
 import shutil
 import pandas as pd
+import config
+from redis import StrictRedis
+redis = StrictRedis(host=config.REDIS_HOST)
 def parse_mtl(path, mtl):
     '''Traverse the downloaded landsat directory and read MTL file
 
@@ -61,14 +64,18 @@ def date_to_nth_day(date, format='%Y%m%d'):
 
 def downloadFile(scene_id_post):
 
+	msg = str(datetime.now()) + '\t' + "Begin download pre flood data ... \n"
+	redis.rpush(config.MESSAGES_KEY, msg)
+	redis.publish(config.CHANNEL_NAME, msg)
+
 	print scene_id_post
 	print scene_id_post[3:9]
 	pathRowPost = scene_id_post[3:9]
 
 	##################### Mulai koneksi ke ftp, ganti credential ########################
 	ftp = FTP( )
-	ftp.connect(host='localhost', port=21, timeout=1246)
-	ftp.login(user='akhiyarwaladi', passwd='rickss12')
+	ftp.connect(host=config.FTP_HOST, port=21, timeout=1246)
+	ftp.login(user=config.FTP_USER, passwd=config.FTP_PASSWD)
 	#ftp.retrlines('LIST') # use to check file after connected
 	#####################################################################################
 
@@ -205,4 +212,8 @@ def downloadFile(scene_id_post):
 	# kembali lagi ke folder aplikasi
 	os.chdir("C:/Apps/Sideba_webapp")
 	# kembalikan scene id ke program utama
+	msg = str(datetime.now()) + '\t' + "Finished download pre flood data ... \n"
+	redis.rpush(config.MESSAGES_KEY, msg)
+	redis.publish(config.CHANNEL_NAME, msg)
+
 	return scene

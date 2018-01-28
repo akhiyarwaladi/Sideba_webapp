@@ -5,6 +5,8 @@ import shutil
 import time
 import smtpEmail as se
 import config
+from redis import StrictRedis
+redis = StrictRedis(host=config.REDIS_HOST)
 
 
 def connect_ftp():
@@ -14,6 +16,10 @@ def connect_ftp():
 	ftp.login(user=config.FTP_USER, passwd=config.FTP_PASSWD)
 
 def downloadFile(liScene):
+	msg = str(datetime.now()) + '\t' + "Begin download post flood data ... \n"
+	redis.rpush(config.MESSAGES_KEY, msg)
+	redis.publish(config.CHANNEL_NAME, msg)
+
 	boolScene = False
 	sceneData = ""
 	levelData = ""
@@ -28,7 +34,7 @@ def downloadFile(liScene):
 	# masuk ke folder landsat 8
 	ftp.cwd('Landsat_8')
 	tahun = str(tupDate.year - 1)
-	hari = str(int(tupDate.strftime('%j')) + 263)
+	hari = str(int(tupDate.strftime('%j')) + 262)
 	print tahun
 	print hari
 	# masuk ke folder tahun
@@ -140,6 +146,10 @@ def downloadFile(liScene):
 			unique = filename.split(".")[0].split("_")[7]
 			# ubah nama file tersebut dengan format [sceneID_band.ext]
 			os.rename(filename, scene + "_" + unique + "." + extension)
+
+	msg = str(datetime.now()) + '\t' + "Finished download post flood data ... \n"
+	redis.rpush(config.MESSAGES_KEY, msg)
+	redis.publish(config.CHANNEL_NAME, msg)
 
 	# kembalikan nama scene dan boolean tanda ke program utama
 	return sceneData, boolScene, tahun, hari, levelData
