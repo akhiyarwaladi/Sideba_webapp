@@ -20,7 +20,13 @@ FOLDER_PREFLOOD = 'C:/data/banjir/preFlood'
 FOLDER_POSTFLOOD = 'C:/data/banjir/postFlood'
 FOLDER_OUTPUT = 'C:/data/banjir/hasil'
 FOLDER_TEMPLATE = 'C:/Apps/Sideba_webapp/app/templates'
+FOLDER_LOG = "C:/data/banjir/log"
 
 FTP_USER = 'akhiyarwaladi'
 FTP_HOST = 'localhost'
 FTP_PASSWD = 'rickss12'
+
+VALUE_deltaNDWI = "0.228"
+VALUE_NDWIduring = "0.548"
+
+EMAIL_DURATION = 3600

@@ -106,29 +106,25 @@ def tail():
 		if(boolScene == False):
 			print "Data hari ini selesai diproses"
 			tupDateLoop = datetime.now()
+			print tupDateNow
+			print tupDateLoop
 			#while (tupDateNow.day == tupDateLoop.day):
-			while (tupDateNow.minute + 30 < tupDateLoop ):
+			while (tupDateNow.minute + 1 > tupDateLoop.minute):
 				print "menunggu hari berganti :)"
 				time.sleep(10)
 				tupDateLoop = datetime.now()
 				
-			os.rename("logComplete.csv", "logComplete/"+str(tupDateNow.day)+"/"+str(tupDateNow.month)+".csv")
+
+			if(os.path.exists(config.FOLDER_LOG + "/" + "logComplete"+"_"+str(tupDateNow.day)+"_"+str(tupDateNow.month)+"_"+str(tupDateNow.year)+".csv")):
+				os.remove(config.FOLDER_LOG + "/" + "logComplete"+"_"+str(tupDateNow.day)+"_"+str(tupDateNow.month)+"_"+str(tupDateNow.year)+".csv")
+			os.rename("logComplete.csv", config.FOLDER_LOG + "/" + "logComplete"+"_"+str(tupDateNow.day)+"_"+str(tupDateNow.month)+"_"+str(tupDateNow.year)+".csv")
 			shutil.copy(config.FOLDER_TEMPLATE + "/logComplete.csv", os.path.join(os.getcwd(), "logComplete.csv"))
 			tupDateNow = tupDateLoop
 			print "hari telah berganti"
 
 		else:
 			sceneIdPre = ftpPre.downloadFile(sceneIdPost)
-			# os.chdir('C:/data/banjir/postFlood/'+ sceneIdPost)
-			# for filename in os.listdir('C:/data/banjir/postFlood/'+ sceneIdPost):
-			# 	productID = filename.split(".")[0]
-			# 	extension = filename.split(".")[1]
-			# 	unique = filename.split(".")[0].split("_")[7]
-
-			# 	os.rename(filename, sceneIdPost + "_" + unique + "." + extension)
-			# 	# print productID
-			# 	# print extension
-			# 	# print unique
+			
 			data_type = "LANDSAT_8"
 
 			pre_flood = config.FOLDER_PREFLOOD + "/" + sceneIdPre
@@ -172,8 +168,8 @@ def tail():
 			post_flood = dat["colummn"][1]
 
 			print("McFeeter")
-			deltaNDWI = "0.228"
-			NDWIduring = "0.548"
+			deltaNDWI = config.VALUE_deltaNDWI
+			NDWIduring = config.VALUE_NDWIduring
 
 			dp.diffNDWI(out_process, os.path.basename(pre_flood), os.path.basename(post_flood))
 			dp.pixelExtraction(out_process, os.path.basename(pre_flood), os.path.basename(post_flood), deltaNDWI, NDWIduring)

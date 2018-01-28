@@ -6,7 +6,9 @@ import time
 import smtpEmail as se
 import config
 
+
 def connect_ftp():
+	global ftp
 	ftp = FTP( )
 	ftp.connect(host=config.FTP_HOST, port=21, timeout=1246)
 	ftp.login(user=config.FTP_USER, passwd=config.FTP_PASSWD)
