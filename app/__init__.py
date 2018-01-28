@@ -8,13 +8,11 @@ from socketio.namespace import BaseNamespace
 
 from assets import assets
 import config
-#import celeryconfig
 
 import pandas as pd
 import os
 import arcpy
 import data_process as dp
-import ftpClient as fc
 import ftpSidebaPre as ftpPre
 import ftpSidebaPost as ftpPost
 from tqdm import *
@@ -108,11 +106,14 @@ def tail():
 		if(boolScene == False):
 			print "Data hari ini selesai diproses"
 			tupDateLoop = datetime.now()
-			while (tupDateNow.day == tupDateLoop.day):
+			#while (tupDateNow.day == tupDateLoop.day):
+			while (tupDateNow.minute + 30 < tupDateLoop ):
 				print "menunggu hari berganti :)"
 				time.sleep(10)
 				tupDateLoop = datetime.now()
 				
+			os.rename("logComplete.csv", "logComplete/"+str(tupDateNow.day)+"/"+str(tupDateNow.month)+".csv")
+			shutil.copy(config.FOLDER_TEMPLATE + "/logComplete.csv", os.path.join(os.getcwd(), "logComplete.csv"))
 			tupDateNow = tupDateLoop
 			print "hari telah berganti"
 
@@ -196,7 +197,7 @@ def tail():
 
 			####################### SAVE LOG DATA YANG TELAH SELESAI DIPROSES ########################################
 			liScene.append(sceneIdPost)
-			liDate.append(str(datetime.now()))
+			liDate.append(str(datetime.now().strftime("%Y-%m-%d %H:%M")))
 
 			print(liScene)
 			print(liDate)
@@ -213,12 +214,26 @@ def tail():
 			print(log2.head(5))
 			log2.to_csv("logComplete.csv", index=False)
 			##########################################################################################################
-			# hapus folder data input saat banjir
-			shutil.rmtree('C:/data/banjir/postFlood/'+ sceneIdPost)
-			# hapus folder data input sebelum banjir
-			shutil.rmtree('C:/data/banjir/preFlood/'+ sceneIdPre)
-			# hapus folder hasil proses yang berisi banyak data
-			shutil.rmtree('C:/data/banjir/hasil/'+ sceneIdPost)
+			
+			############################## BEGIN DELETE FOLDER ##############################
+			dataPost = os.listdir('C:/data/banjir/postFlood/')
+			if(len(dataPost) > 1):
+				dataPost.remove(sceneIdPost)
+				# hapus folder data input saat banjir
+				shutil.rmtree('C:/data/banjir/postFlood/'+ dataPost[0])
+
+			dataPre = os.listdir('C:/data/banjir/preFlood/')
+			if(len(dataPre) > 1):
+				dataPre.remove(sceneIdPre)
+				# hapus folder data input sebelum banjir
+				shutil.rmtree('C:/data/banjir/preFlood/'+ dataPre[0])
+
+			hasilPost = os.listdir('C:/data/banjir/hasil/')
+			if(len(hasilPost) > 1):
+				hasilPost.remove(sceneIdPost)
+				# hapus folder hasil proses yang berisi banyak data
+				shutil.rmtree('C:/data/banjir/hasil/'+ hasilPost[-1])
+			##################################################################################
 
 			msg = str(datetime.now()) + '\t' + "Finished ... \n"
 			redis.rpush(config.MESSAGES_KEY, msg)

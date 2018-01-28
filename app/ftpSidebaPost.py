@@ -4,6 +4,13 @@ from datetime import datetime
 import shutil
 import time
 import smtpEmail as se
+import config
+
+def connect_ftp():
+	ftp = FTP( )
+	ftp.connect(host=config.FTP_HOST, port=21, timeout=1246)
+	ftp.login(user=config.FTP_USER, passwd=config.FTP_PASSWD)
+
 def downloadFile(liScene):
 	boolScene = False
 	sceneData = ""
@@ -13,15 +20,13 @@ def downloadFile(liScene):
 	#print now.year, now.month, now.day, now.hour, now.minute, now.second # check every datetime detail
 	##################### MULAI KONEKSI KE FTP #############################################
 	#################### GANTI DENGAN CREDENTIAL SEBENARNYA ################################
-	ftp = FTP( )
-	ftp.connect(host='localhost', port=21, timeout=1246)
-	ftp.login(user='akhiyarwaladi', passwd='rickss12')
+	connect_ftp()
 	#ftp.retrlines('LIST') # use to check file after connected
 	########################################################################################
 	# masuk ke folder landsat 8
 	ftp.cwd('Landsat_8')
 	tahun = str(tupDate.year - 1)
-	hari = str(int(tupDate.strftime('%j')) + 266)
+	hari = str(int(tupDate.strftime('%j')) + 263)
 	print tahun
 	print hari
 	# masuk ke folder tahun
@@ -33,6 +38,11 @@ def downloadFile(liScene):
 		print "Belum ada folder data hari ini ("+hari+")"
 		se.kirimEmail("Belum ada folder data hari ini ("+hari+")")
 		time.sleep(30)
+
+		connect_ftp()
+
+		ftp.cwd('Landsat_8')
+		ftp.cwd(tahun)
 		folderTahun = ftp.nlst()
 
 	# masuk ke folder hari dalam format doy
@@ -42,7 +52,14 @@ def downloadFile(liScene):
 	# jika di dalam folder hari kosong looping terus
 	while (len(folderHari) == 0):
 		print "Belum ada data di dalam folder hari " + hari 
-		time.sleep(5)
+		se.kirimEmail("Belum ada data di dalam folder hari ini ("+hari+")")
+		time.sleep(30)
+
+		connect_ftp()
+
+		ftp.cwd('Landsat_8')
+		ftp.cwd(tahun)
+		ftp.cwd(hari)
 		folderHari = ftp.nlst()
 
 	# looping setiap folder level data landsat

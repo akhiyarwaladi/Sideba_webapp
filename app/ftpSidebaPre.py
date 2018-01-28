@@ -136,6 +136,9 @@ def downloadFile(scene_id_post):
 				# masukkan scene id ke dictionary
 				cloud_dict_id[product_id] = scene
 
+				# jika sudah masuk dictionary hapus metadata tersebut
+				os.remove('C:/data/banjir/preFlood/' + fileMtl)
+
 				# keluar dari scene
 				ftp.cwd("../")
 			# keluar dari level

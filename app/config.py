@@ -19,3 +19,8 @@ CHANNEL_NAME_2 = 'val-channel'
 FOLDER_PREFLOOD = 'C:/data/banjir/preFlood'
 FOLDER_POSTFLOOD = 'C:/data/banjir/postFlood'
 FOLDER_OUTPUT = 'C:/data/banjir/hasil'
+FOLDER_TEMPLATE = 'C:/Apps/Sideba_webapp/app/templates'
+
+FTP_USER = 'akhiyarwaladi'
+FTP_HOST = 'localhost'
+FTP_PASSWD = 'rickss12'
