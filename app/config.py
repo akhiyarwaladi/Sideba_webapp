@@ -26,6 +26,10 @@ FTP_USER = 'akhiyarwaladi'
 FTP_HOST = 'localhost'
 FTP_PASSWD = 'rickss12'
 
+# FTP_USER = '10.10.4.228'
+# FTP_HOST = 'otomatis2017'
+# FTP_PASSWD = 'lapan2017'
+
 VALUE_deltaNDWI = "0.228"
 VALUE_NDWIduring = "0.548"
 

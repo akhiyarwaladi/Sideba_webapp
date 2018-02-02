@@ -130,6 +130,9 @@ def tail():
 			pre_flood = config.FOLDER_PREFLOOD + "/" + sceneIdPre
 			post_flood = config.FOLDER_POSTFLOOD + "/" + sceneIdPost
 			out_process = config.FOLDER_OUTPUT + "/" + sceneIdPost
+			# pre_flood = "C:/data/banjir/simulasi/LC81190652016273LGN00"
+			# post_flood = "C:/data/banjir/simulasi/LC81190652017067RPI00"
+			# out_process = config.FOLDER_OUTPUT + "/" + "simulasi"
 
 			if(os.path.exists(out_process)):
 				shutil.rmtree(out_process, ignore_errors=True)
@@ -228,10 +231,10 @@ def tail():
 			if(len(hasilPost) > 1):
 				hasilPost.remove(sceneIdPost)
 				# hapus folder hasil proses yang berisi banyak data
-				shutil.rmtree('C:/data/banjir/hasil/'+ hasilPost[-1])
+				#shutil.rmtree('C:/data/banjir/hasil/'+ hasilPost[-1])
 			##################################################################################
 
-			msg = str(datetime.now()) + '\t' + "Finished ... \n"
+			msg = "Finished"
 			redis.rpush(config.MESSAGES_KEY, msg)
 			redis.publish(config.CHANNEL_NAME, msg)
 			redis.delete(config.MESSAGES_KEY)
@@ -248,12 +251,20 @@ class TailNamespace(BaseNamespace):
 		self.pubsub.subscribe(config.CHANNEL_NAME)
 		self.pubsub.subscribe(config.CHANNEL_NAME_2)
 
-		i=1
+		i=23
+		j = 0
 		for m in self.pubsub.listen():
+			if(i==100):
+				i=23
 			if m['type'] == 'message':
-				self.emit(config.SOCKETIO_CHANNEL, m['data'])
+				self.emit(config.SOCKETIO_CHANNEL, m['data'] + str(j))
+				if(m['data'] == 'Finished'):
+					i = 100
 				self.emit(config.SOCKETIO_CHANNEL_2, i)
-				i = i+0.1
+				#j = j+1
+
+				i = i+1
+				#i = 100
 
     def on_subscribe(self):
         self.pubsub = redis.pubsub()

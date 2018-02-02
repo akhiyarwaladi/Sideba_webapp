@@ -34,7 +34,7 @@ def downloadFile(liScene):
 	# masuk ke folder landsat 8
 	ftp.cwd('Landsat_8')
 	tahun = str(tupDate.year - 1)
-	hari = str(int(tupDate.strftime('%j')) + 262)
+	hari = str(int(tupDate.strftime('%j')) + 258)
 	print tahun
 	print hari
 	# masuk ke folder tahun
@@ -106,6 +106,12 @@ def downloadFile(liScene):
 			ftp.cwd(scene)
 			# jadikan list semua file yang ada dalam folder scenen untuk didownload
 			filesPreFlood = ftp.nlst()
+			# jika folder data belum lengkap
+			if len(filesPreFlood) < 14:
+				print "scene" + str(scene) + " data folder ini belum lengkap"
+				# lanjut lihat folder scene yang lainnya 
+				continue;
+				
 			filesPreFlood2 = [img for img in filesPreFlood if img.endswith("_B3.TIF") or img.endswith("_B4.TIF") or img.endswith("_B5.TIF") or 
 			img.endswith("_BQA.TIF") or img.endswith("_MTL.txt")]
 			print filesPreFlood2
