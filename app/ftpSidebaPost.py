@@ -6,6 +6,7 @@ import time
 import smtpEmail as se
 import config
 from redis import StrictRedis
+import sys
 redis = StrictRedis(host=config.REDIS_HOST)
 
 
@@ -32,9 +33,14 @@ def downloadFile(liScene):
 	#ftp.retrlines('LIST') # use to check file after connected
 	########################################################################################
 	# masuk ke folder landsat 8
-	ftp.cwd('Landsat_8')
-	tahun = str(tupDate.year - 1)
-	hari = str(int(tupDate.strftime('%j')) + 258)
+	try:
+		ftp.cwd('Landsat_8')
+	except:
+		se.kirimEmail("Folder data raw (Landat_8) belum ada di buffer")
+		sys.exit("Folder data raw (Landat_8) belum ada di buffer")
+
+	tahun = str(tupDate.year)
+	hari = str(int(tupDate.strftime('%j')) - 2)
 	print tahun
 	print hari
 	# masuk ke folder tahun
@@ -45,7 +51,7 @@ def downloadFile(liScene):
 	while (hari not in folderTahun):
 		print "Belum ada folder data hari ini ("+hari+")"
 		se.kirimEmail("Belum ada folder data hari ini ("+hari+")")
-		time.sleep(30)
+		time.sleep(7200)
 
 		connect_ftp()
 
@@ -61,7 +67,7 @@ def downloadFile(liScene):
 	while (len(folderHari) == 0):
 		print "Belum ada data di dalam folder hari " + hari 
 		se.kirimEmail("Belum ada data di dalam folder hari ini ("+hari+")")
-		time.sleep(30)
+		time.sleep(7200)
 
 		connect_ftp()
 
